@@ -22,6 +22,8 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import PsychologyIcon from '@mui/icons-material/Psychology';
+import SpaIcon from '@mui/icons-material/Spa';
+import { signOut, getAuth } from 'firebase/auth'; 
 
 //internal imports 
 import { theme } from '../../../Theme/themes'
@@ -91,6 +93,8 @@ const navStyles = {
 export const NavBar = () => {
     const [ open, setOpen ]= useState(false)
     const navigate = useNavigate();
+    const myAuth = localStorage.getItem('auth') 
+    const auth = getAuth(); 
 
      // 2 functions to help us set our hook
      const handleDrawerOpen = () => {
@@ -110,16 +114,38 @@ export const NavBar = () => {
             onClick: () => navigate('/')
         },
         {
-            text: 'Shop',
-            icon: <LibraryBooksIcon />,
-            onClick: () => navigate('/shop')
+            text: myAuth === 'true' ? 'Resources' : 'Sign In',
+            icon: myAuth === 'true' ? <LibraryBooksIcon /> : <SpaIcon />,
+            onClick: () => navigate(myAuth === 'true' ? '/shop' : 'auth')
         },
         {
-            text: 'Cart',
-            icon: <HealthAndSafetyIcon />,
-            onClick: () => navigate('/cart')
+            text: myAuth === 'true' ? 'Find A Provider' : '',
+            icon: myAuth === 'true' ? <HealthAndSafetyIcon /> : "",
+            onClick: myAuth === 'true' ? () => navigate('/cart') : () => {}
         }
     ]
+
+
+    let signInText = 'Sign In'
+       
+    if (myAuth === 'true') { 
+         signInText = 'Sign Out'
+
+    }
+
+    const signInButton = async () => {
+        if (myAuth === 'false') {
+            navigate('/auth')
+        } else {
+            await signOut(auth)
+            localStorage.setItem('auth', 'false')
+            localStorage.setItem('user', '')
+            localStorage.setItem('uuid', '')
+            navigate('/')
+        }
+    }
+
+
 
     return (
         <Box sx={{display: 'flex'}}>
@@ -152,8 +178,9 @@ export const NavBar = () => {
                             color = 'info'
                             size = 'large'
                             sx = {{ marginLeft: '20px'}}
+                            onClick = {signInButton}
                         >
-                            Sign In
+                            { signInText }
                         </Button>
                     </Stack>
             </AppBar>
