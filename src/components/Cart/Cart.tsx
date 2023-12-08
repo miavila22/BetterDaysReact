@@ -1,4 +1,6 @@
 import * as _React from 'react';
+// if it gets mad, do "import React from 'react';
+
 import { useState, useEffect } from 'react'; 
 import {
     Accordion,
@@ -10,9 +12,6 @@ import {
     Grid,
     Box,
     Button,
-    Dialog,
-    DialogContent,
-    DialogContentText,
     Stack,
     Typography,
     Snackbar,
@@ -27,9 +26,16 @@ import { ShopProps } from '../../customHooks';
 import { shopStyles } from '../Shop';
 import { serverCalls } from '../../api';
 import { MessageType } from '../Auth'; 
+import { Order } from '../Order'
+
+//making an interface for what our data needs to look like when we checkout
+export interface CreateOrderProps {
+    order: ShopProps[]
+}
 
 
 export const Cart = () => {
+//   setup our hooks
     const db = getDatabase();
     const [ open, setOpen ] = useState(false)
     const [ message, setMessage] = useState<string>()
@@ -67,7 +73,7 @@ export const Cart = () => {
         return () => {
             off(cartRef)
         }
-    })
+    }, []);
 
     // Full CRUD capabilities for our Cart 
     // Update Cart
@@ -137,20 +143,54 @@ export const Cart = () => {
         })
     }
 
+//create a function to be able to checkout so basically making that api call to our order
+const checkout = async () => {
+
+    const data: CreateOrderProps = {
+        'order': currentCart as ShopProps[]
+    }
+
+    const response = await serverCalls.createOrder(data)
+
+    if (response.status === 200){ //200 is a good status code
+        remove(cartRef) //this is removing our whole entire cartRef aka emptying our cart
+        .then(() => {
+            console.log("Cart cleared successfully")
+            setMessage('Successfully Checkout')
+            setMessageType('success')
+            setOpen(true)
+            setTimeout(()=>{window.location.reload()}, 3000)
+        })
+        .catch((error) => {
+            console.log("Error clearing cart: " + error.message)
+            setMessage(error.message)
+            setMessageType('error')
+            setOpen(true)
+            setTimeout(()=>{window.location.reload()}, 3000)
+        })
+    } else {
+        setMessage('Error with your Checkout')
+        setMessageType('error')
+        setOpen(true)
+        setTimeout(()=>{window.location.reload()}, 3000)
+    }
+}
+
 
 
     return (
         <Box sx={shopStyles.main}>
             <NavBar />
-            <Stack direction = 'column' sx={shopStyles.main}>
+            <Stack direction = 'column' sx={shopStyles.main} alignItems='center'>
                 <Stack direction = 'row' alignItems = 'center' sx={{marginTop: '100px', marginLeft: '200px'}}>
                     <Typography 
                         variant = 'h4'
-                        sx = {{ marginRight: '20px'}}
+                        sx = {{ marginRight: '20px' }}
+                        color = 'black'
                     >
                         Your Cart
                     </Typography>
-                    <Button color = 'primary' variant = 'contained' onClick={()=>{}} >Checkout</Button>
+                    <Button color = 'success' variant = 'contained' onClick={ checkout } >Checkout 🎄</Button>
                 </Stack>
                 <Grid container spacing={3} sx={shopStyles.grid}>
                     {currentCart?.map((cart: ShopProps, index: number) => (
@@ -161,6 +201,7 @@ export const Cart = () => {
                                     sx = {shopStyles.cardMedia}
                                     image = {cart.image}
                                     alt = {cart.name}
+                                    color = 'black'
                                 />
                                 <CardContent>
                                     <Stack direction = 'column' justifyContent='space-between' alignItems = 'center'>
@@ -179,13 +220,14 @@ export const Cart = () => {
                                             alignItems = 'center' 
                                             justifyContent='space-between' 
                                             sx={shopStyles.stack2}
+                                            color = 'black'
                                         >
                                             <Button 
                                                 size='large'
                                                 variant='text'
                                                 onClick={()=>{updateQuantity(cart.id, 'dec')}}
                                             >-</Button>
-                                            <Typography variant = 'h6' sx={{color: 'white'}}>
+                                            <Typography variant = 'h6' sx={{color: 'black'}}>
                                                 {cart.quantity}
                                             </Typography>
                                             <Button 
@@ -199,6 +241,7 @@ export const Cart = () => {
                                             variant = 'outlined'
                                             sx = {shopStyles.button}
                                             onClick = {()=>{updateCart(cart)}}
+                                            
                                         >
                                             Update Quantity = ${(cart.quantity * parseFloat(cart.price)).toFixed(2)}
                                         </Button>
@@ -207,6 +250,8 @@ export const Cart = () => {
                                             variant = 'outlined'
                                             sx = {shopStyles.button}
                                             onClick = {()=>{deleteItem(cart)}}
+                                            color = 'success'
+                                            
                                         >
                                             Delete Item From Cart
                                         </Button>
@@ -217,8 +262,26 @@ export const Cart = () => {
                         </Grid>
                     ))}
                 </Grid>
+                <Stack direction = 'column' sx ={{width:'75%'}} color='black'>
+                    <Typography
+                        variant = 'h4'
+                        sx= {{ marginTop: '100px', marginBottom: '100px'}}
+                        color = 'black'
+                        >
+                            Your Order
+                        </Typography>
+                        <Order />
+                </Stack>
             </Stack>
-
+            <Snackbar
+                open={open}
+                autoHideDuration={2000}
+                onClose={()=> setOpen(false)}
+            >
+                <Alert severity = {messageType}>
+                    {message}
+                </Alert>
+            </Snackbar>
         </Box>
     )
 }

@@ -134,7 +134,7 @@ const AddToCart = (cart: CartProps) => {
         //using push because we are pushing an object to our list
 
         push(cartRef, myCart)
-        .then((newCartRef) => {
+        .then((_newCartRef) => {
             setMessage(`Successfully added item ${myCart.name} to Cart`)
             setMessageType('success')
             setOpen(true)
