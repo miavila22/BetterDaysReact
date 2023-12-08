@@ -125,9 +125,8 @@ const AddToCart = (cart: CartProps) => {
         
 
 
-        //if they try to add a qty greater than available, it'll just go down to available qty.
 
-        if(myCart.quantity > parseInt(data.quantity)) {
+        if(myCart.quantity as number > parseInt(data.quantity)) {
            myCart.quantity = parseInt(data.quantity)
         }
 

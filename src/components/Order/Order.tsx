@@ -22,7 +22,7 @@ import { MessageType } from '../Auth';
 
 
 
-//we want our columns to match our data object. Name, description, price, qty...etc
+//we want our columns to match our data object. Name, description, price, quantity...etc
 const columns: GridColDef[] = [
   { field: 'image', //this needs to match the keys in our objects/dicts
    headerName: 'Image', //this is what is being displayed as the column header

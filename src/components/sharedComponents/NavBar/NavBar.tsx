@@ -114,12 +114,12 @@ export const NavBar = () => {
             onClick: () => navigate('/')
         },
         {
-            text: myAuth === 'true' ? 'Resources' : 'Sign In',
+            text: myAuth === 'true' ? 'Shop' : 'Sign In',
             icon: myAuth === 'true' ? <LibraryBooksIcon /> : <SpaIcon />,
             onClick: () => navigate(myAuth === 'true' ? '/shop' : 'auth')
         },
         {
-            text: myAuth === 'true' ? 'Find A Provider' : '',
+            text: myAuth === 'true' ? 'Cart' : '',
             icon: myAuth === 'true' ? <HealthAndSafetyIcon /> : "",
             onClick: myAuth === 'true' ? () => navigate('/cart') : () => {}
         }

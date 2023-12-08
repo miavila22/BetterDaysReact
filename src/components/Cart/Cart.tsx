@@ -190,7 +190,7 @@ const checkout = async () => {
                     >
                         Your Cart
                     </Typography>
-                    <Button color = 'success' variant = 'contained' onClick={ checkout } >Checkout 🎄</Button>
+                    <Button color = 'success' variant = 'contained' onClick={ checkout } >Checkout</Button>
                 </Stack>
                 <Grid container spacing={3} sx={shopStyles.grid}>
                     {currentCart?.map((cart: ShopProps, index: number) => (
